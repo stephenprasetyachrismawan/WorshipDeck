@@ -1,0 +1,45 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [main, master, 'claude/**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Pasang dependensi
+        run: npm ci
+
+      - name: Tes
+        run: npm test
+
+      - name: Bangun installer & versi portable
+        run: npx electron-builder --win --x64 --publish never
+
+      - name: Unggah hasil build
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorshipDeck-Windows
+          path: |
+            dist/*.exe
+          if-no-files-found: error
+
+      - name: Rilis (hanya untuk tag v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.exe
