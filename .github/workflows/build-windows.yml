@@ -43,17 +43,29 @@ jobs:
             dist/*.exe
           if-no-files-found: error
 
-      - name: Baca versi
-        id: ver
+      - name: Tentukan rilis
+        id: rel
         shell: bash
-        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+        run: |
+          ver=$(node -p "require('./package.json').version")
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"; echo "go=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ inputs.release }}" == "true" ]]; then
+            echo "tag=v$ver" >> "$GITHUB_OUTPUT"; echo "go=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" ]] && [ -z "$(git ls-remote --tags origin "refs/tags/v$ver")" ]; then
+            # versi baru di package.json yang belum pernah dirilis: rilis otomatis
+            echo "tag=v$ver" >> "$GITHUB_OUTPUT"; echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Rilis (tag v* atau jalankan manual dengan opsi release)
-        if: startsWith(github.ref, 'refs/tags/v') || inputs.release
+      - name: Rilis
+        if: steps.rel.outputs.go == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', steps.ver.outputs.version) }}
+          tag_name: ${{ steps.rel.outputs.tag }}
           target_commitish: ${{ github.sha }}
-          name: WorshipDeck ${{ steps.ver.outputs.version }}
+          name: WorshipDeck ${{ steps.rel.outputs.version }}
           generate_release_notes: true
           files: dist/*.exe

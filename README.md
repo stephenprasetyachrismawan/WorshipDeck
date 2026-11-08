@@ -113,7 +113,7 @@ npm run dist
 ```
 
 Installer Windows dibangun otomatis oleh GitHub Actions (workflow **Build Windows**) di setiap push;
-unduh artefak **WorshipDeck-Windows** dari tab Actions. Rilis dibuat dengan push tag `v*`, atau jalankan workflow secara manual (Run workflow) dengan centang **release**.
+unduh artefak **WorshipDeck-Windows** dari tab Actions. Rilis dibuat otomatis saat push bila versi di `package.json` belum pernah dirilis (naikkan versi untuk rilis baru), atau lewat push tag `v*`, atau Run workflow dengan centang **release**.
 
 ## Lisensi
 
