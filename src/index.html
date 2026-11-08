@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>WorshipDeck</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="logo">WD</div>
+      <div><b>WorshipDeck</b><small>Liturgi → slide</small></div>
+    </div>
+    <button id="btn-new" class="primary block">+ Project baru</button>
+    <div class="side-label">Project</div>
+    <ul id="project-list"></ul>
+    <div class="side-bottom">
+      <button id="nav-library" class="ghost block">📚 Pustaka (semua project)</button>
+      <button id="nav-settings" class="ghost block">⚙️ Pengaturan</button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <section id="view-welcome" class="view">
+      <div class="welcome">
+        <h1>Selamat datang di WorshipDeck</h1>
+        <p>Ubah liturgi menjadi slide ibadah dalam beberapa langkah:</p>
+        <ol>
+          <li><b>Mulai</b> — isi data ibadah dan pilih template.</li>
+          <li><b>Berkas</b> — unggah liturgi, warta jemaat, lirik lagu.</li>
+          <li><b>Bagian</b> — atur urutan bagian liturgi.</li>
+          <li><b>Tampilan</b> — ukuran huruf, warna, latar.</li>
+          <li><b>Isi</b> — AI menyusun isi slide (JSON). Bisa disunting.</li>
+          <li><b>Hasil</b> — mesin membuat PPT, lalu sunting di <b>DeckCraft</b> dan simpan sebagai template.</li>
+        </ol>
+        <button id="btn-new-2" class="primary">Buat project pertama</button>
+      </div>
+    </section>
+
+    <section id="view-project" class="view hidden">
+      <header class="project-head">
+        <div>
+          <h1 id="p-title">Project</h1>
+          <div id="p-sub" class="muted"></div>
+        </div>
+        <div class="head-actions">
+          <span id="save-state" class="muted"></span>
+          <button id="btn-duplicate" class="ghost" title="Salin pengaturan, bagian, dan template ke project baru">Duplikat</button>
+          <button id="btn-folder" class="ghost">Buka folder</button>
+          <button id="btn-delete" class="ghost danger">Hapus</button>
+        </div>
+      </header>
+      <nav class="tabs" id="tabs">
+        <button data-tab="mulai" class="active">1 · Mulai</button>
+        <button data-tab="berkas">2 · Berkas</button>
+        <button data-tab="bagian">3 · Bagian</button>
+        <button data-tab="tampilan">4 · Tampilan</button>
+        <button data-tab="isi">5 · Isi</button>
+        <button data-tab="hasil">6 · Hasil & DeckCraft</button>
+      </nav>
+
+      <div class="tab-body" id="tab-mulai"></div>
+      <div class="tab-body hidden" id="tab-berkas"></div>
+      <div class="tab-body hidden" id="tab-bagian"></div>
+      <div class="tab-body hidden" id="tab-tampilan"></div>
+      <div class="tab-body hidden" id="tab-isi"></div>
+      <div class="tab-body hidden" id="tab-hasil"></div>
+    </section>
+
+    <section id="view-library" class="view hidden"></section>
+    <section id="view-settings" class="view hidden"></section>
+  </main>
+
+  <div id="toast"></div>
+  <div id="modal" class="hidden"><div class="modal-box"></div></div>
+
+  <script src="preview.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

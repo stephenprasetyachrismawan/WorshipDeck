@@ -1,0 +1,70 @@
+{
+  "name": "worshipdeck",
+  "productName": "WorshipDeck",
+  "version": "0.1.0",
+  "description": "Ubah dokumen liturgi menjadi slide PowerPoint dengan bantuan AI, lalu sunting di DeckCraft",
+  "main": "main.js",
+  "author": "Stephen Prasetya Chrismawan",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test \"test/**/*.test.js\"",
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir"
+  },
+  "build": {
+    "appId": "id.worshipdeck.app",
+    "productName": "WorshipDeck",
+    "copyright": "WorshipDeck",
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib/**/*",
+      "src/**/*",
+      "build/icon.png"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${arch}-${target}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "WorshipDeck",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    }
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
+    "jszip": "^3.10.2",
+    "mammoth": "^1.13.0",
+    "pptxgenjs": "^4.0.1"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0"
+  }
+}

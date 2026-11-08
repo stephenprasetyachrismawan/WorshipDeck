@@ -1,0 +1,71 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [main, master, 'claude/**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Buat GitHub Release dari build ini (tag v<versi package.json>)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Pasang dependensi
+        run: npm ci
+
+      - name: Tes
+        run: npm test
+
+      - name: Bangun installer & versi portable
+        run: npx electron-builder --win --x64 --publish never
+
+      - name: Unggah hasil build
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorshipDeck-Windows
+          path: |
+            dist/*.exe
+          if-no-files-found: error
+
+      - name: Tentukan rilis
+        id: rel
+        shell: bash
+        run: |
+          ver=$(node -p "require('./package.json').version")
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"; echo "go=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ inputs.release }}" == "true" ]]; then
+            echo "tag=v$ver" >> "$GITHUB_OUTPUT"; echo "go=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" ]] && [ -z "$(git ls-remote --tags origin "refs/tags/v$ver")" ]; then
+            # versi baru di package.json yang belum pernah dirilis: rilis otomatis
+            echo "tag=v$ver" >> "$GITHUB_OUTPUT"; echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rilis
+        if: steps.rel.outputs.go == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.rel.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: WorshipDeck ${{ steps.rel.outputs.version }}
+          generate_release_notes: true
+          files: dist/*.exe
